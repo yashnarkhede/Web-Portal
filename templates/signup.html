@@ -12,6 +12,10 @@
         <!-- component -->
 <div class="grid min-h-screen place-items-center">
   <div class="w-11/12 p-12 bg-white sm:w-8/12 md:w-1/2 lg:w-5/12">
+    <div class="text-red-600 font-bold" role="alert">
+      {{msg}}
+    </div>
+    <br>
     <h1 class="text-xl font-semibold">Hello there 👋, <span class="font-normal">please fill in your information to continue</span></h1>
     <form class="mt-6" action="/register" method="POST">
       <div class="flex justify-between gap-3">
