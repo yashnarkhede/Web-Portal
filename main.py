@@ -30,7 +30,7 @@ class Cart(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", method='GET')
 def start():
     return render_template('loginpage.html')
 
