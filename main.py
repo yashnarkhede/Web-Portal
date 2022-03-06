@@ -31,7 +31,7 @@ class Cart(db.Model):
 
 @app.route("/")
 def start():
-    return redirect(url_for('login'))
+    return render_template('loginpage.html')
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
