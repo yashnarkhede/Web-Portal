@@ -1,5 +1,4 @@
-import email
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import re
 
@@ -12,6 +11,8 @@ db = SQLAlchemy(app)
 
 app.secret_key = "Not Defined yet"
 
+# print statements for personal understandings
+
 class Login(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -19,8 +20,17 @@ class Login(db.Model):
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
-@app.route("/", methods=['GET', 'POST'])
-def main():
+@app.route("/")
+def start():
+    if 'loggedin' in session:
+        return redirect(url_for('home'))
+    return redirect(url_for('login'))
+
+@app.route("/home", methods=['GET', 'POST'])
+def home():
+    print(session)
+    if 'loggedin' in session:
+        return render_template('index.html')
     return redirect(url_for('login'))
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -71,10 +81,20 @@ def login():
         print(user.password, entered_pass)
         if user.password==entered_pass:
             print('right credentials')
-            return render_template('index.html')
+            session['loggedin'] = True
+            session['id'] = user.id
+            session['email'] = user.email
+            return redirect(url_for('home'))
         
     return render_template('loginpage.html')
 
+@app.route("/logout")
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('email', None)
+    print(session)
+    return redirect(url_for('login'))
 
 @app.route("/almond", methods=['GET', 'POST'])
 def almond():
