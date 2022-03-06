@@ -100,5 +100,9 @@ def logout():
 def almond():
     return render_template('almond.html')
 
+@app.route("/kaju", methods=['GET', 'POST'])
+def kaju():
+    return render_template('kaju.html')
+
 if __name__=="__main__":
     app.run(debug=True)
