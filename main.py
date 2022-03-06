@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import re
@@ -29,7 +30,7 @@ class Cart(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def start():
     return render_template('loginpage.html')
 
@@ -98,7 +99,7 @@ def login():
         
     return render_template('loginpage.html',msg=msg)
 
-@app.route("/logout")
+@app.route("/logout", methods=['GET', 'POST'])
 def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
@@ -107,7 +108,7 @@ def logout():
     print(session)
     return redirect(url_for('login'))
 
-@app.route('/cart')
+@app.route('/cart', methods=['GET', 'POST'])
 def cart():
     return render_template('cart.html')
 
