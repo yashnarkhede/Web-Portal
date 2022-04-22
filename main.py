@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import re
@@ -21,6 +20,15 @@ class Login(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
+
+# Admin Login
+class Admin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    
     
 # Add to Cart
 class Cart(db.Model):
@@ -30,9 +38,31 @@ class Cart(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
 
-@app.route("/", method='GET')
+@app.route("/", methods=['GET'])
 def start():
-    return render_template('loginpage.html')
+    return render_template('')
+
+@app.route("/admin", methods=['GET', 'POST'])
+def admin():
+    msg = ""
+    if request.method=='POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        usr = Admin.query.filter_by(email=email).first()
+        if not usr:
+            msg = "Email does not exist"
+            return render_template('adminlogin.html',msg=msg)
+        if usr.password!=password:
+            msg = "Entered wrong password"
+            return render_template('adminlogin.html',msg=msg)
+        msg = "Logged in Successfully"
+        session['adminlogin'] = True
+        session['id'] = usr.id
+        session['adminemail'] = usr.email
+        return render_template('adminhome.html')
+    return render_template('adminlogin.html')
+        
+        
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
@@ -122,4 +152,4 @@ def kaju():
 
 
 if __name__=="__main__":
-    app.run()
+    app.run(debug=True)
