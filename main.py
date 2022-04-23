@@ -40,7 +40,12 @@ class Cart(db.Model):
 
 @app.route("/", methods=['GET'])
 def start():
-    return render_template('')
+    return render_template('startpage.html')
+
+# adding the admin in db
+admin = Admin(first_name='dhananjay', last_name='pai', email='dhananjay2002pai@gmail.com', password='123456')
+db.session.add(admin)
+db.session.commit()
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
@@ -60,7 +65,7 @@ def admin():
         session['id'] = usr.id
         session['adminemail'] = usr.email
         return render_template('adminhome.html')
-    return render_template('adminlogin.html')
+    return render_template('adminlogin.html',msg=msg)
         
         
 
