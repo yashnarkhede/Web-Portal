@@ -37,6 +37,12 @@ class Cart(db.Model):
     variety = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
+    
+class AdminItems(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item_name = db.Column(db.Integer, nullable=False)
+    item_quantity = db.Column(db.Integer, nullable=False)
+    item_price = db.Column(db.Integer)
 
 @app.route("/", methods=['GET'])
 def start():
@@ -64,10 +70,24 @@ def admin():
         session['adminlogin'] = True
         session['id'] = usr.id
         session['adminemail'] = usr.email
-        return render_template('adminhome.html')
+        return redirect(url_for('adminhome'))
+    if session.get('adminlogin'):
+        return redirect(url_for('adminhome'))
     return render_template('adminlogin.html',msg=msg)
+
+@app.route("/adminhome", methods=['GET', 'POST'])
+def adminhome():
+    msg = ""
+    if session['adminlogin']:
+        return render_template('adminhome.html')
+    return redirect(url_for('admin'))
         
-        
+@app.route('/adminlogout', methods=['GET', 'POST'])
+def alogout():
+    session.pop('adminlogin', None)
+    session.pop('id', None)
+    session.pop('adminemail', None)
+    return redirect(url_for('admin'))
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
@@ -133,6 +153,18 @@ def login():
         return render_template('index.html',msg=msg)
         
     return render_template('loginpage.html',msg=msg)
+
+@app.route("/admin/view", methods=['GET', 'POST'])
+def view():
+    return render_template('adminview.html')
+
+@app.route("/admin/add", methods=['GET', 'POST'])
+def add():
+    return render_template('adminadd.html')
+
+@app.route("/admin/update", methods=['GET', 'POST'])
+def update():
+    return render_template('adminupdate.html ')
 
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
