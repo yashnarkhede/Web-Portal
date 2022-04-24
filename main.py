@@ -42,7 +42,7 @@ class AdminItems(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     item_name = db.Column(db.Integer, nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False)
-    item_price = db.Column(db.Integer)
+    item_price = db.Column(db.Integer, nullable=False)
 
 @app.route("/", methods=['GET'])
 def start():
