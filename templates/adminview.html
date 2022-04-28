@@ -12,6 +12,27 @@
   </head>
   <body>
     <h1>View the existing items in the list</h1>
+    <div class="container">
+      <div class="alert alert-info" role="alert">
+        Total Number of items present = {{data|length}}
+      </div>
+    </div>
+      {% for ind,item_data in data.items() %}
+      <br>
+      <div class="container">
+        
+        <h6>Sr Number {{loop.index}}</h6>
+
+          <div class="container">
+            <h5 class="card-title">{{item_data[0]}}</h5>
+            <p class="card-text">{{item_data[1]}} grams with a price of {{item_data[2]}} Rs.</p>
+            
+          </div>
+        </div>
+        <br>
+</div>
+<br>
+  {% endfor %}
 
     <!-- Optional JavaScript; choose one of the two! -->
 

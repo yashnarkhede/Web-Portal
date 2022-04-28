@@ -1,15 +1,24 @@
+from msilib.schema import AdminExecuteSequence
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import re
+from collections import defaultdict
+import os
+from werkzeug.utils import secure_filename
+
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///login.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///models.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+UPLOAD_FOLDER = r"C:\Users\dhana\coding\Personal Projects\Web-Portal\static\Images"
+
 
 db = SQLAlchemy(app)
 
 app.secret_key = "Not Defined yet"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # print statements for personal understandings
 
@@ -43,15 +52,18 @@ class AdminItems(db.Model):
     item_name = db.Column(db.Integer, nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False)
     item_price = db.Column(db.Integer, nullable=False)
+    item_image = db.Column(db.String(255),nullable=False)
 
 @app.route("/", methods=['GET'])
 def start():
     return render_template('startpage.html')
 
 # adding the admin in db
+'''
 admin = Admin(first_name='dhananjay', last_name='pai', email='dhananjay2002pai@gmail.com', password='123456')
 db.session.add(admin)
 db.session.commit()
+'''
 
 @app.route("/admin", methods=['GET', 'POST'])
 def admin():
@@ -156,15 +168,47 @@ def login():
 
 @app.route("/admin/view", methods=['GET', 'POST'])
 def view():
-    return render_template('adminview.html')
+    if session.get('adminlogin'):
+        all_data = AdminItems.query.all()
+        
+        data = defaultdict(list)
+        for i in all_data:
+            data[i.id] = [i.item_name,i.item_quantity,i.item_price]
+        print(data)
+        return render_template('adminview.html',data=data)
+    return redirect(url_for('admin'))
 
 @app.route("/admin/add", methods=['GET', 'POST'])
 def add():
-    return render_template('adminadd.html')
+    msg = ""
+    if session.get('adminlogin'):
+        if request.method=='POST':
+            file = request.files.get('image')
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'],filename)
+            file.save(file_path)
+            print('image saved')
+            pname = request.form.get('pname')
+            pquantity = request.form.get('pquantity')
+            pquantity = int(pquantity)
+            pprice = request.form.get('pprice')
+            pprice = int(pprice)
+            print(pname,pquantity,pprice,file_path)
+            
+            product = AdminItems(item_name=pname,item_quantity=pquantity,item_price=pprice,item_image=file_path)
+            db.session.add(product)
+            db.session.commit()
+            print('saved')
+            msg = 'Item added Successfully'
+            return render_template('adminadd.html', msg=msg)
+        return render_template('adminadd.html',msg=msg)
+    return redirect(url_for('admin'))
 
 @app.route("/admin/update", methods=['GET', 'POST'])
 def update():
-    return render_template('adminupdate.html ')
+    if session.get('adminlogin'):
+        return render_template('adminupdate.html ')
+    return redirect(url_for('admin'))
 
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
